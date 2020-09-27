@@ -7,6 +7,7 @@ import logging
 import time
 from enum import IntEnum
 
+RECV_SIZE = 1024
 
 class DobissSystem:
 
@@ -16,6 +17,7 @@ class DobissSystem:
         self._port = port
 
         self.socket = None
+        self.recvBuffer = bytearray()
 
         self.availableModules = [ ]
         self.modules = { }
@@ -65,6 +67,7 @@ class DobissSystem:
             return True
 
         success = False
+        self.recvBuffer = bytearray()
 
         if tryUntilSuccess:
             # Keep connecting the TCP socket until success
@@ -121,26 +124,29 @@ class DobissSystem:
     def receiveResponse(self, sentDataSize, responseSize):
         """Receive response"""
 
+        # Receive until we have enough data
+        # The data consists of the sent data (padded to 32 bytes) and then the response data (padded to 32 bytes)
+        sentDataPaddingSize = (32 - (sentDataSize % 32)) % 32
+        responsePaddingSize = (32 - (responseSize % 32)) % 32
+        totalSize = sentDataSize + sentDataPaddingSize + responseSize + responsePaddingSize
+        while len(self.recvBuffer) < totalSize:
+            self.recvBuffer += self.socket.recv(RECV_SIZE)
+            #print(f"Received from socket. Buffer is now length {len(self.recvBuffer)}")
+
         # We first recieve the original packet back
         # TODO Actually check the content
-        original = self.socket.recv(sentDataSize)
-        
-        # Padding to 32 bytes
-        paddingSize = (32 - (sentDataSize % 32)) % 32
-        if paddingSize > 0:
-            padding = self.socket.recv(paddingSize)
+        #original = self.recvBuffer[:sentDataSize]
         
         # The actual response data
+        responseData = bytearray()
         if responseSize > 0:
-            responseData = self.socket.recv(responseSize)
-        else:
-            responseData = bytearray()
-        
-        # Padding to 32 bytes
-        paddingSize = (32 - (responseSize % 32)) % 32
-        if paddingSize > 0:
-            padding = self.socket.recv(paddingSize)
+            start = sentDataSize + sentDataPaddingSize
+            end = start + responseSize
+            responseData = self.recvBuffer[start:end]
 
+        # Remove the response from the buffer        
+        self.recvBuffer = self.recvBuffer[totalSize:]
+        
         return responseData
 
 
