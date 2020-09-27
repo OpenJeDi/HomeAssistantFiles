@@ -3,6 +3,6 @@
   "name": "Dobiss Domotics",
   "documentation": "https://dobiss.be",
   "dependencies": [],
-  "codeowners": [],
+  "codeowners": ["@OpenJeDi"],
   "requirements": []
 }
