@@ -5,19 +5,19 @@ Helper module for communicating with a Dobiss home automation system.
 import socket
 import logging
 import time
-from homeassistant.const import CONF_HOST, CONF_PORT
 from enum import IntEnum
 
 
 class DobissSystem:
 
-    def __init__(self, hass, config):
+    def __init__(self, host, port):
 
-        self.config = config
-        self.hass = hass
+        self._host = host
+        self._port = port
 
         self.socket = None
 
+        self.availableModules = [ ]
         self.modules = { }
         self.outputs = [ ]
         self.values = { }
@@ -25,12 +25,12 @@ class DobissSystem:
     @property
     def host(self):
         """Return the host of this system."""
-        return self.config.get(CONF_HOST)
+        return self._host
 
     @property
     def port(self):
         """Return the port of this system."""
-        return self.config.get(CONF_PORT)
+        return self._port
 
     @property
     def lights(self):
