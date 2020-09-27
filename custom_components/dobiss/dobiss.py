@@ -194,7 +194,7 @@ class DobissSystem:
 
         # Import the module
         #data = bytearray.fromhex("AF 10 FF " + chr(moduleAddr).encode('hex') + " 00 00 10 01 10 FF FF FF FF FF FF AF")
-        data = bytearray.fromhex("AF 10 FF " + '{:02x}'.format(moduleAddr) + " 00 00 10 01 10 FF FF FF FF FF FF AF")
+        data = bytearray.fromhex("AF 10 FF " + f"{moduleAddr:02x}" + " 00 00 10 01 10 FF FF FF FF FF FF AF")
         self.sendData(data)
 
         moduleData = self.receiveResponse(len(data), 16)
@@ -236,7 +236,7 @@ class DobissSystem:
 
         # Import the module
         #data = bytearray.fromhex("AF 10 " + chr(moduleType).encode('hex') +  + chr(moduleAddr).encode('hex') + " 01 00 20 " + chr(outputCount).encode('hex') + " 20 FF FF FF FF FF FF AF")
-        data = bytearray.fromhex("AF 10 " + '{:02x}'.format(moduleType.value) + '{:02x}'.format(moduleAddr) + " 01 00 20 " + '{:02x}'.format(outputCount) + " 20 FF FF FF FF FF FF AF")
+        data = bytearray.fromhex("AF 10 " + f"{moduleType.value:02x}" + f"{moduleAddr:02x}" + " 01 00 20 " + f"{outputCount:02x}" + " 20 FF FF FF FF FF FF AF")
         self.sendData(data)
 
         # <module.outputCount> lines of 32 bytes
@@ -264,7 +264,7 @@ class DobissSystem:
         """Request the status of all outputs of a module."""
 
         # Request the status
-        data = bytearray.fromhex("AF 01 " + '{:02x}'.format(moduleType.value) + '{:02x}'.format(moduleAddr) + " 00 00 00 01 00 FF FF FF FF FF FF AF")
+        data = bytearray.fromhex("AF 01 " + f"{moduleType.value:02x}" + f"{moduleAddr:02x}" + " 00 00 00 01 00 FF FF FF FF FF FF AF")
         self.sendData(data)
 
         statusData = self.receiveResponse(len(data), 16)
@@ -311,7 +311,7 @@ class DobissSystem:
         """Generic method to send an action to an output."""
 
         # Send the request header
-        headerData = bytearray.fromhex("AF 02 FF " + '{:02x}'.format(moduleAddr) + " 00 00 08 01 08 FF FF FF FF FF FF AF")
+        headerData = bytearray.fromhex("AF 02 FF " + f"{moduleAddr:02x}" + " 00 00 08 01 08 FF FF FF FF FF FF AF")
         self.sendData(headerData)
 
         # Note: no additional data is sent back
