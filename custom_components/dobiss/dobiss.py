@@ -290,6 +290,12 @@ class DobissSystem:
                 self.values[moduleAddr][outputIndex] = value
 
 
+    def requestAllStatus(self):
+        """Request the status of all outputs of all modules."""
+
+        for moduleAddr, module in self.modules.items():
+            self.requestStatus(module['address'], module['type'], module['outputCount'])
+
 
     class Action(IntEnum):
         """The type of action."""
