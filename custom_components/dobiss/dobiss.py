@@ -133,7 +133,7 @@ class DobissSystem:
             self.recvBuffer += self.socket.recv(RECV_SIZE)
             #print(f"Received from socket. Buffer is now length {len(self.recvBuffer)}")
 
-        # We first recieve the original packet back
+        # We first receive the original packet back
         # TODO Actually check the content
         #original = self.recvBuffer[:sentDataSize]
         
