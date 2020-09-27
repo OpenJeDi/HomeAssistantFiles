@@ -118,6 +118,32 @@ class DobissSystem:
         return dataSent
 
 
+    def receiveResponse(self, sentDataSize, responseSize):
+        """Receive response"""
+
+        # We first recieve the original packet back
+        # TODO Actually check the content
+        original = self.socket.recv(sentDataSize)
+        
+        # Padding to 32 bytes
+        paddingSize = (32 - (sentDataSize % 32)) % 32
+        if paddingSize > 0:
+            padding = self.socket.recv(paddingSize)
+        
+        # The actual response data
+        if responseSize > 0:
+            responseData = self.socket.recv(responseSize)
+        else:
+            responseData = bytearray()
+        
+        # Padding to 32 bytes
+        paddingSize = (32 - (responseSize % 32)) % 32
+        if paddingSize > 0:
+            padding = self.socket.recv(paddingSize)
+
+        return responseData
+
+
     def importFullInstallation(self):
         """Import the installation, all modules, their outputs and their status."""
 
@@ -139,10 +165,7 @@ class DobissSystem:
         data = bytearray.fromhex("AF 0B 00 00 30 00 10 01 10 FF FF FF FF FF FF AF")
         self.sendData(data)
 
-        original = self.socket.recv(len(data))
-        padding = self.socket.recv((32 - (len(data) % 32)) % 32)
-        installationData = self.socket.recv(16)
-        padding = self.socket.recv((32 - (16 % 32)) % 32)
+        installationData = self.receiveResponse(len(data), 16)
 
         # Parse the installation
         self.availableModules = [ ]
@@ -174,10 +197,7 @@ class DobissSystem:
         data = bytearray.fromhex("AF 10 FF " + '{:02x}'.format(moduleAddr) + " 00 00 10 01 10 FF FF FF FF FF FF AF")
         self.sendData(data)
 
-        original = self.socket.recv(len(data))
-        padding = self.socket.recv((32 - (len(data) % 32)) % 32)
-        moduleData = self.socket.recv(16)
-        padding = self.socket.recv((32 - (16 % 32)) % 32)
+        moduleData = self.receiveResponse(len(data), 16)
 
         #moduleAddr = ord(moduleData[0])
         #moduleType = ord(moduleData[14])
@@ -222,11 +242,7 @@ class DobissSystem:
         # <module.outputCount> lines of 32 bytes
         # Output names of 30 characters; convert byte array to string;
         # data[30] = icon type (0=light, 1=plug, 2=fan, 3=up, 4=down); data[31] = group index
-
-        original = self.socket.recv(len(data))
-        padding = self.socket.recv((32 - (len(data) % 32)) % 32)
-        outputsData = self.socket.recv(32 * (outputCount + 1)) #
-        # Note: no padding because we have lines of 32 bytes
+        outputsData = self.receiveResponse(len(data), 32 * outputCount)
 
         for outputIndex in range(0, outputCount):
             line = outputsData[outputIndex * 32 : (outputIndex + 1) * 32]
@@ -251,11 +267,7 @@ class DobissSystem:
         data = bytearray.fromhex("AF 01 " + '{:02x}'.format(moduleType.value) + '{:02x}'.format(moduleAddr) + " 00 00 00 01 00 FF FF FF FF FF FF AF")
         self.sendData(data)
 
-        original = self.socket.recv(len(data))
-        padding = self.socket.recv((32 - (len(data) % 32)) % 32)
-        statusData = self.socket.recv(16) # One line of 16 bytes
-        padding = self.socket.recv((32 - (16 % 32)) % 32)
-
+        statusData = self.receiveResponse(len(data), 16)
 
         if not moduleAddr in self.values:
             self.values[moduleAddr] = [ ]
@@ -298,17 +310,16 @@ class DobissSystem:
     def sendAction(self, moduleAddr, outputIndex, action, value = 100, delayOn = 0xFF, delayOff = 0xFF, softDim = 0xFF, red = 0xFF):
         """Generic method to send an action to an output."""
 
-        # Send the request
+        # Send the request header
         headerData = bytearray.fromhex("AF 02 FF " + '{:02x}'.format(moduleAddr) + " 00 00 08 01 08 FF FF FF FF FF FF AF")
         self.sendData(headerData)
 
         # Note: no additional data is sent back
-        original = self.socket.recv(len(headerData))
-        padding = self.socket.recv((32 - (len(headerData) % 32)) % 32)
+        self.receiveResponse(len(headerData), 0)
 
+        # Send the request data
         requestData = bytes((moduleAddr, outputIndex, action.value, delayOn, delayOff, int(value), softDim, red))
         self.sendData(requestData)
 
         # Note: no additional data is sent back
-        original = self.socket.recv(len(requestData))
-        padding = self.socket.recv((32 - (len(requestData) % 32)) % 32)
+        self.receiveResponse(len(requestData), 0)
