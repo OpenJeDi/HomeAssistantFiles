@@ -124,8 +124,8 @@ class DobissSystem:
         # Import installation
         self.importInstallation()
 
-        # TEMP Hardcoded modules
-        for moduleAddr in [1, 2, 3, 4, 5]:
+        # Import modules
+        for moduleAddr in self.availableModules:
             self.importModule(moduleAddr)
 
         # Outputs and their current value
@@ -144,7 +144,20 @@ class DobissSystem:
         installationData = self.socket.recv(16)
         padding = self.socket.recv((32 - (16 % 32)) % 32)
 
-        # TODO Parse the installation
+        # Parse the installation
+        self.availableModules = [ ]
+
+        # First 11 bytes (bits 0-81) contain whether or not there is a module with the specific address (1-82)
+        for i in range(0, 82):
+            byteNum = int(i / 8)
+            bitNum = int(i % 8)
+            hasModule = (installationData[byteNum] >> bitNum) & 1
+            if hasModule:
+                channelAddr = i + 1
+                self.availableModules.append(channelAddr)
+        
+        # DEBUG TEMP
+        print(self.availableModules)
 
 
     class ModuleType(IntEnum):
