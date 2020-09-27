@@ -185,8 +185,7 @@ class DobissSystem:
                 channelAddr = i + 1
                 self.availableModules.append(channelAddr)
         
-        # DEBUG TEMP
-        print(self.availableModules)
+        print("Available modulles: " + str(self.availableModules))
 
 
     class ModuleType(IntEnum):
@@ -228,6 +227,7 @@ class DobissSystem:
             'outputCount': outputCount
         }
 
+        print(f"Module {moduleAddr} imported: " + str(self.modules[moduleAddr]))
 
     class OutputType(IntEnum):
         """The type of output."""
@@ -263,7 +263,9 @@ class DobissSystem:
                 'name': outputName,
                 'type': outputType,
                 'groupIndex': groupIndex
-           })
+            })
+
+            print(f"Output imported: " + str(self.outputs[len(self.outputs) - 1]))
 
 
     def requestStatus(self, moduleAddr, moduleType, outputCount):
