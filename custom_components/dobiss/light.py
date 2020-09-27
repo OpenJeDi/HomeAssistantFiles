@@ -3,7 +3,7 @@ import logging
 import voluptuous as vol
 from .dobiss import DobissSystem
 
-from homeassistant.components.light import SUPPORT_FLASH, SUPPORT_TRANSITION, SUPPORT_BRIGHTNESS, ATTR_BRIGHTNESS, Light, PLATFORM_SCHEMA
+from homeassistant.components.light import SUPPORT_FLASH, SUPPORT_TRANSITION, SUPPORT_BRIGHTNESS, ATTR_BRIGHTNESS, LightEntity, PLATFORM_SCHEMA
 from homeassistant.components.switch import (SwitchDevice, PLATFORM_SCHEMA)
 from homeassistant.const import CONF_HOST, CONF_PORT
 import homeassistant.helpers.config_validation as cv
@@ -38,7 +38,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     host = config.get(CONF_HOST)
     port = config.get(CONF_PORT)
 
-    dobiss = DobissSystem(hass, config)
+    dobiss = DobissSystem(host, port)
 
     # Connect with the Dobiss system
     #dobiss.connect(host, port)
@@ -69,7 +69,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     _LOGGER.info("Dobiss lights added.")
 
 
-class HomeAssistantDobissLight(Light):
+class HomeAssistantDobissLight(LightEntity):
     """Representation of a Dobiss light in HomeAssistant."""
 
     def __init__(self, light, dobiss):
@@ -80,7 +80,7 @@ class HomeAssistantDobissLight(Light):
         self._brightness = None
 
         # We keep a separate connection for each light for now
-        self.dobiss = DobissSystem(dobiss.hass, dobiss.config)
+        self.dobiss = DobissSystem(dobiss.host, dobiss.port)
         self.dobiss.modules = dobiss.modules
         self.dobiss.outputs = dobiss.outputs
         self.dobiss.values = dobiss.values
@@ -165,7 +165,7 @@ class HomeAssistantDobissFan(SwitchDevice):
         self._state = None
 
         # We keep a separate connection for each output for now
-        self.dobiss = DobissSystem(dobiss.hass, dobiss.config)
+        self.dobiss = DobissSystem(dobiss.host, dobiss.port)
         self.dobiss.modules = dobiss.modules
         self.dobiss.outputs = dobiss.outputs
         self.dobiss.values = dobiss.values
