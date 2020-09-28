@@ -1,0 +1,22 @@
+{
+    "title": "Dobiss Domotics",
+    "config": {
+        "step": {
+            "user": {
+                "title": "Dobiss Domotics",
+                "description": "Enter the host and port of the Dobiss LAN controller.",
+                "data": {
+                    "host": "The host IP address",
+                    "port": "The port to connect to"
+                }
+            }
+        },
+        "error": {
+            "invalid_host": "We cannot connect to the host"
+        },
+        "abort": {
+            "cannot_connect": "Unable to connect to the LAN controller",
+            "already_configured": "This host is already configured"
+        }
+    }
+}
