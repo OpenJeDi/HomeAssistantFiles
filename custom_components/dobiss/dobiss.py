@@ -43,6 +43,7 @@ class DobissSystem:
 
         return result
 
+    @property
     def fans(self):
         result = [ ]
         for output in self.outputs:
@@ -51,6 +52,7 @@ class DobissSystem:
 
         return result
 
+    @property
     def plugs(self):
         result = [ ]
         for output in self.outputs:
