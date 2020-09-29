@@ -81,18 +81,18 @@ class HomeAssistantDobissLight(CoordinatorEntity, LightEntity):
         brightness control.
         """
         pct = int(kwargs.get(ATTR_BRIGHTNESS, 255) * 100 / 255)
-        if self.dobiss.connect(True): # Retry until connected
-            self.dobiss.setOn(self._light['moduleAddress'], self._light['index'], pct)
-            self.dobiss.disconnect()
+        #if self.dobiss.connect(True): # Retry until connected
+        self.dobiss.setOn(self._light['moduleAddress'], self._light['index'], pct)
+            #self.dobiss.disconnect()
 
-            # Poll states
-            await self.coordinator.async_request_refresh()
+        # Poll states
+        await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs):
         """Instruct the light to turn off."""
-        if self.dobiss.connect(True): # Retry until connected
-            self.dobiss.setOff(self._light['moduleAddress'], self._light['index'])
-            self.dobiss.disconnect()
+        #if self.dobiss.connect(True): # Retry until connected
+        self.dobiss.setOff(self._light['moduleAddress'], self._light['index'])
+            #self.dobiss.disconnect()
 
-            # Poll states
-            await self.coordinator.async_request_refresh()
+        # Poll states
+        await self.coordinator.async_request_refresh()

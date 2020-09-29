@@ -15,7 +15,7 @@ import homeassistant.helpers.config_validation as cv
 
 from .const import DOMAIN
 
-PLATFORMS = ["light", "fan"]
+PLATFORMS = ["light", "fan", "switch"]
 
 SCAN_INTERVAL = timedelta(seconds=10)
 
@@ -108,7 +108,7 @@ class DobissDataUpdateCoordinator(DataUpdateCoordinator):
         # Import installation
         self.dobiss.importFullInstallation()
         # We are done, free the connection
-        self.dobiss.disconnect()
+        #self.dobiss.disconnect()
 
         super().__init__(
             hass,
@@ -119,8 +119,8 @@ class DobissDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Query states"""
-        if self.dobiss.connect(False): # Don't retry until connected
-            self.dobiss.requestAllStatus()
-            self.dobiss.disconnect()
+        #if self.dobiss.connect(True):
+        self.dobiss.requestAllStatus()
+            #self.dobiss.disconnect()
         
         return self.dobiss.values
