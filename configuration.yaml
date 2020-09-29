@@ -133,11 +133,12 @@ stream:
 binary_sensor:
   - platform: ffmpeg_noise
     name: BabyNoise
-    input: http://192.168.1.105/videostream.asf?user=admin&pwd=medisana
+    input: "http://192.168.1.105/videostream.asf?user=admin&pwd=medisana"
+    #output: TODO audio output
     extra_arguments: -filter:a highpass=f=300,lowpass=f=2500,volume=volume=2 -codec:a libmp3lame -ar 16000
     initial_state: false
     duration: 2
-    reset: 60
+    reset: 30
     peak: -32
 
 input_boolean:
