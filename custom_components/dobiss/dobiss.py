@@ -43,6 +43,7 @@ class DobissSystem:
 
         return result
 
+    @property
     def fans(self):
         result = [ ]
         for output in self.outputs:
@@ -51,6 +52,7 @@ class DobissSystem:
 
         return result
 
+    @property
     def plugs(self):
         result = [ ]
         for output in self.outputs:
@@ -67,7 +69,6 @@ class DobissSystem:
             return True
 
         success = False
-        self.recvBuffer = bytearray()
 
         if tryUntilSuccess:
             # Keep connecting the TCP socket until success
@@ -108,15 +109,16 @@ class DobissSystem:
            Keeps trying to send the data until it is successful, reconnecting with the system if necessary.
         """
         dataSent = False
-        #while not dataSent:
-        try:
-            self.socket.sendall(data)
-            dataSent = True
+        while not dataSent:
+            try:
+                self.socket.sendall(data)
+                dataSent = True
 
-        except socket.error:
-            #disconnect()
-            #connect()
-            dataSent = False
+            except socket.error:
+                print("Dobiss socket disconnected. Reconnecting...")
+                disconnect()
+                connect(False)
+                dataSent = False
 
         return dataSent
 
@@ -130,8 +132,23 @@ class DobissSystem:
         responsePaddingSize = (32 - (responseSize % 32)) % 32
         totalSize = sentDataSize + sentDataPaddingSize + responseSize + responsePaddingSize
         while len(self.recvBuffer) < totalSize:
-            self.recvBuffer += self.socket.recv(RECV_SIZE)
-            #print(f"Received from socket. Buffer is now length {len(self.recvBuffer)}")
+            try:
+                newData = [ ]
+                if self.socket:
+                    newData = self.socket.recv(RECV_SIZE)
+                
+                if len(newData) == 0:
+                    print("Dobiss socket connection closed: reconnecting")
+                    self.disconnect()
+                    self.connect(False)
+                else:
+                    self.recvBuffer += newData
+                    #print(f"Received from socket. Buffer is now length {len(self.recvBuffer)}")
+            
+            except socket.error:
+                print("Dobiss socket receive error: reconnecting")
+                self.disconnect()
+                self.connect(False)
 
         # We first receive the original packet back
         # TODO Actually check the content

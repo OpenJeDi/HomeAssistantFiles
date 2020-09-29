@@ -4,5 +4,6 @@
   "documentation": "https://dobiss.be",
   "dependencies": [],
   "codeowners": ["@OpenJeDi"],
-  "requirements": []
+  "requirements": [],
+  "config_flow": true
 }

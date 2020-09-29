@@ -1,0 +1,42 @@
+{
+    "config": {
+        "flow_title": "Discovered Dobiss LAN controller at {host}:{port}",
+        "step": {
+            "user": {
+                "description": "Enter the host and port of the Dobiss LAN controller.",
+                "data": {
+                    "host": "The host IP address",
+                    "port": "The port to connect to",
+                    "scan_interval": "The interval in which we get the output states"
+                }
+            }
+        },
+        "error": {
+            "invalid_host": "We cannot connect to the host"
+        },
+        "abort": {
+            "cannot_connect": "Unable to connect to the LAN controller",
+            "already_configured": "This host is already configured"
+        }
+    },
+    "options": {
+        "flow_title": "Setup Dobiss LAN controller",
+        "step": {
+            "user": {
+                "description": "Enter the host and port of the Dobiss LAN controller.",
+                "data": {
+                    "host": "The host IP address",
+                    "port": "The port to connect to",
+                    "scan_interval": "The interval in which we get the output states"
+                }
+            }
+        },
+        "error": {
+            "invalid_host": "We cannot connect to the host"
+        },
+        "abort": {
+            "cannot_connect": "Unable to connect to the LAN controller",
+            "already_configured": "This host is already configured"
+        }
+    }
+}
