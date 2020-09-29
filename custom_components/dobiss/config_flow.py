@@ -1,7 +1,7 @@
 from homeassistant import config_entries
 from homeassistant.helpers import config_entry_flow
-from homeassistant.const import CONF_HOST, CONF_PORT
-from .const import DOMAIN
+from homeassistant.const import CONF_HOST, CONF_PORT, CONF_SCAN_INTERVAL
+from .const import DOMAIN, DEFAULT_PORT, DEFAULT_SCAN_INTERVAL
 import voluptuous as vol
 
 # TODO Discovery

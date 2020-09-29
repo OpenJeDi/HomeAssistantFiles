@@ -13,9 +13,8 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 import homeassistant.helpers.config_validation as cv
 
-from .const import DOMAIN
+from .const import DOMAIN, PLATFORMS, DEFAULT_PORT, DEFAULT_SCAN_INTERVAL
 
-PLATFORMS = ["light", "fan", "switch"]
 
 SCAN_INTERVAL = timedelta(seconds=10)
 
@@ -25,7 +24,7 @@ _LOGGER = logging.getLogger(__name__)
 # Validation of the user's configuration
 # PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
 #    vol.Required(CONF_HOST): cv.string,
-#    vol.Optional(CONF_PORT, default=10001): cv.port
+#    vol.Optional(CONF_PORT, default=DEFAULT_PORT): cv.port,
 # })
 
 
@@ -39,7 +38,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
 #        return True
 #    
 #    host = config[DOMAIN].get(CONF_HOST)
-#    port = config[DOMAIN].get(CONF_PORT, 10001)
+#    port = config[DOMAIN].get(CONF_PORT, DEFAULT_PORT)
 #
 #    # We need a host
 #    if not host:
