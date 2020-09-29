@@ -6,7 +6,8 @@
                 "description": "Enter the host and port of the Dobiss LAN controller.",
                 "data": {
                     "host": "The host IP address",
-                    "port": "The port to connect to"
+                    "port": "The port to connect to",
+                    "scan_interval": "The interval in which we get the output states"
                 }
             }
         },
@@ -25,7 +26,8 @@
                 "description": "Enter the host and port of the Dobiss LAN controller.",
                 "data": {
                     "host": "The host IP address",
-                    "port": "The port to connect to"
+                    "port": "The port to connect to",
+                    "scan_interval": "The interval in which we get the output states"
                 }
             }
         },
