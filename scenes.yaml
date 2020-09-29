@@ -1,0 +1,378 @@
+- id: '1589109141738'
+  name: Terras licht aan
+  entities:
+    light.terras_links_boven:
+      brightness: 254
+      friendly_name: Terras links boven
+      is_deconz_group: false
+      state: 'on'
+      supported_features: 41
+    light.terras_links_onder:
+      brightness: 254
+      friendly_name: Terras links onder
+      is_deconz_group: false
+      state: 'on'
+      supported_features: 41
+    light.terras_rechts_boven:
+      brightness: 254
+      friendly_name: Terras rechts boven
+      is_deconz_group: false
+      state: 'on'
+      supported_features: 41
+    light.terras_rechts_onder:
+      brightness: 254
+      friendly_name: Terras rechts onder
+      is_deconz_group: false
+      state: 'on'
+      supported_features: 41
+    sensor.tradfri_on_off_switch_battery_level:
+      device_class: battery
+      event_id: tradfri_on_off_switch
+      friendly_name: TRÅDFRI on/off switch Battery Level
+      state: '87'
+      unit_of_measurement: '%'
+- id: '1589109424333'
+  name: Terras licht uit
+  entities:
+    light.terras_links_boven:
+      friendly_name: Terras links boven
+      is_deconz_group: false
+      state: 'off'
+      supported_features: 41
+    light.terras_links_onder:
+      friendly_name: Terras links onder
+      is_deconz_group: false
+      state: 'off'
+      supported_features: 41
+    light.terras_rechts_boven:
+      friendly_name: Terras rechts boven
+      is_deconz_group: false
+      state: 'off'
+      supported_features: 41
+    light.terras_rechts_onder:
+      friendly_name: Terras rechts onder
+      is_deconz_group: false
+      state: 'off'
+      supported_features: 41
+- id: '1590925675848'
+  name: Keuken - Koken
+  entities:
+    light.aanrecht:
+      friendly_name: Hanglampen
+      groupIndex: 1
+      index: 2
+      moduleAddress: 2
+      name: Aanrecht
+      state: 'on'
+      supported_features: 40
+      type: 0
+    light.keuken:
+      friendly_name: Keuken
+      groupIndex: 1
+      index: 0
+      moduleAddress: 2
+      name: Keuken
+      state: 'on'
+      supported_features: 40
+      type: 0
+    light.keuken_aanrecht_1:
+      brightness: 191
+      color_temp: 367
+      friendly_name: Keuken Aanrecht 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'on'
+      supported_features: 43
+    light.keuken_aanrecht_2:
+      brightness: 191
+      color_temp: 367
+      friendly_name: Keuken Aanrecht 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'on'
+      supported_features: 43
+    light.keuken_eetkamer_1:
+      friendly_name: Keuken-eetkamer 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_eetkamer_2:
+      friendly_name: Keuken-eetkamer 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_eetkamer_3:
+      friendly_name: Keuken-eetkamer 3
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_gootsteen_1:
+      brightness: 191
+      color_temp: 367
+      friendly_name: Keuken Gootsteen 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'on'
+      supported_features: 43
+    light.keuken_gootsteen_2:
+      brightness: 191
+      color_temp: 367
+      friendly_name: Keuken Gootsteen 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'on'
+      supported_features: 43
+    light.keuken_midden_1:
+      friendly_name: Keuken Midden 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_midden_2:
+      friendly_name: Keuken Midden 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.spots_keuken:
+      friendly_name: Spots keuken
+      groupIndex: 1
+      index: 1
+      moduleAddress: 2
+      name: Spots keuken
+      state: 'on'
+      supported_features: 40
+      type: 0
+    light.spots_keukeneiland:
+      friendly_name: Spots keukeneiland
+      groupIndex: 1
+      index: 3
+      moduleAddress: 2
+      name: Spots keukeneiland
+      state: 'on'
+      supported_features: 40
+      type: 0
+- id: '1590925841199'
+  name: Keuken - Sfeer
+  entities:
+    light.aanrecht:
+      friendly_name: Hanglampen
+      groupIndex: 1
+      index: 2
+      moduleAddress: 2
+      name: Aanrecht
+      state: 'off'
+      supported_features: 40
+      type: 0
+    light.keuken:
+      friendly_name: Keuken
+      groupIndex: 1
+      index: 0
+      moduleAddress: 2
+      name: Keuken
+      state: 'on'
+      supported_features: 40
+      type: 0
+    light.keuken_aanrecht_1:
+      brightness: 26
+      color_temp: 367
+      friendly_name: Keuken Aanrecht 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'on'
+      supported_features: 43
+    light.keuken_aanrecht_2:
+      brightness: 26
+      color_temp: 367
+      friendly_name: Keuken Aanrecht 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'on'
+      supported_features: 43
+    light.keuken_eetkamer_1:
+      friendly_name: Keuken-eetkamer 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_eetkamer_2:
+      friendly_name: Keuken-eetkamer 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_eetkamer_3:
+      friendly_name: Keuken-eetkamer 3
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_gootsteen_1:
+      brightness: 26
+      color_temp: 367
+      friendly_name: Keuken Gootsteen 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'on'
+      supported_features: 43
+    light.keuken_gootsteen_2:
+      brightness: 2
+      color_temp: 367
+      friendly_name: Keuken Gootsteen 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'on'
+      supported_features: 43
+    light.keuken_midden_1:
+      friendly_name: Keuken Midden 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_midden_2:
+      friendly_name: Keuken Midden 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.spots_keuken:
+      friendly_name: Spots keuken
+      groupIndex: 1
+      index: 1
+      moduleAddress: 2
+      name: Spots keuken
+      state: 'on'
+      supported_features: 40
+      type: 0
+    light.spots_keukeneiland:
+      friendly_name: Spots keukeneiland
+      groupIndex: 1
+      index: 3
+      moduleAddress: 2
+      name: Spots keukeneiland
+      state: 'on'
+      supported_features: 40
+      type: 0
+- id: '1590925947542'
+  name: Keuken - Uit
+  entities:
+    light.aanrecht:
+      friendly_name: Hanglampen
+      groupIndex: 1
+      index: 2
+      moduleAddress: 2
+      name: Aanrecht
+      state: 'off'
+      supported_features: 40
+      type: 0
+    light.keuken:
+      friendly_name: Keuken
+      groupIndex: 1
+      index: 0
+      moduleAddress: 2
+      name: Keuken
+      state: 'on'
+      supported_features: 40
+      type: 0
+    light.keuken_aanrecht_1:
+      friendly_name: Keuken Aanrecht 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_aanrecht_2:
+      friendly_name: Keuken Aanrecht 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_eetkamer_1:
+      friendly_name: Keuken-eetkamer 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_eetkamer_2:
+      friendly_name: Keuken-eetkamer 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_eetkamer_3:
+      friendly_name: Keuken-eetkamer 3
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_gootsteen_1:
+      friendly_name: Keuken Gootsteen 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_gootsteen_2:
+      friendly_name: Keuken Gootsteen 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_midden_1:
+      friendly_name: Keuken Midden 1
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.keuken_midden_2:
+      friendly_name: Keuken Midden 2
+      is_deconz_group: false
+      max_mireds: 500
+      min_mireds: 153
+      state: 'off'
+      supported_features: 43
+    light.spots_keuken:
+      friendly_name: Spots keuken
+      groupIndex: 1
+      index: 1
+      moduleAddress: 2
+      name: Spots keuken
+      state: 'on'
+      supported_features: 40
+      type: 0
+    light.spots_keukeneiland:
+      friendly_name: Spots keukeneiland
+      groupIndex: 1
+      index: 3
+      moduleAddress: 2
+      name: Spots keukeneiland
+      state: 'on'
+      supported_features: 40
+      type: 0

@@ -1,0 +1,152 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Uncomment this if you are using SSL/TLS, running in Docker container, etc.
+# http:
+#   base_url: example.duckdns.org:8123
+
+# Text to speech
+tts:
+  - platform: google_translate
+    language: 'nl'
+
+#####
+# Start of custom configuration
+#####
+
+influxdb:
+  host: a0d7b954-influxdb
+  port: 8086
+  database: homeassistant
+  username: homeassistant
+  password: homeassistant
+  max_retries: 3
+  default_measurement: state
+
+# Light groups
+light:
+  - platform: group
+    name: Keuken midden
+    entities:
+      - light.keuken_midden_1
+      - light.keuken_midden_2
+  - platform: group
+    name: Keuken aanrecht
+    entities:
+      - light.keuken_aanrecht_1
+      - light.keuken_aanrecht_2
+  - platform: group
+    name: Keuken gootsteen
+    entities:
+      - light.keuken_gootsteen_1
+      - light.keuken_gootsteen_2
+  - platform: group
+    name: Keuken - eetkamer
+    entities:
+      - light.keuken_eetkamer_1
+      - light.keuken_eetkamer_2
+      - light.keuken_eetkamer_3
+  - platform: group
+    name: Keuken alles
+    entities:
+      - light.keuken_midden_1
+      - light.keuken_midden_2
+      - light.keuken_aanrecht_1
+      - light.keuken_aanrecht_2
+      - light.keuken_gootsteen_1
+      - light.keuken_gootsteen_2
+      - light.keuken_eetkamer_1
+      - light.keuken_eetkamer_2
+      - light.keuken_eetkamer_3
+      # Note: not a smart light, this is the dobiss light
+      - light.aanrecht
+      
+  - platform: group
+    name: Terras
+    entities:
+      - light.terras_links_boven
+      - light.terras_links_onder
+      - light.terras_rechts_boven
+      - light.terras_rechts_onder
+
+# Dobiss Home Automation
+  #- platform: dobiss
+  #  host: 192.168.1.116
+  #  port: 10001
+    #scan_interval: 10 # Note: lights behaved very weird once not long after enabling this, so...
+
+# dobiss:
+#   host: 192.168.1.116
+#   port: 10001
+
+# Smappee
+smappee:
+  #host: 192.168.1.128
+  client_id: !secret smappee_client_id
+  client_secret: !secret smappee_client_secret
+
+# Afvalbeheer
+sensor:
+    - platform: afvalbeheer
+      wastecollector: Limburg.NET
+      resources:
+        - grofvuil
+        - houtafval
+        - keukenafval
+        - papier
+        - plastics
+        - pmd
+        - restafval
+        - textiel
+        - tuinafval
+        - tuinbak
+      postcode: 3920
+      streetname: Molenstraat
+      streetnumber: 38
+      cityname: Lommel
+      printwastetypes: 1
+      upcomingsensor: 1
+      dutch: 1
+
+# Baby Cam
+camera:
+  #- platform: mjpeg
+  #- platform: generic
+  - platform: ffmpeg
+    name: BabyCam
+    still_image_url: http://192.168.1.105/snapshot.jpg?user=admin&pwd=medisana
+    #mjpeg_url: http://192.168.1.105/videostream.asf?user=admin&pwd=medisana
+    #stream_source: http://192.168.1.105/videostream.asf?user=admin&pwd=medisana
+    verify_ssl: false
+    username: admin
+    password: medisana
+    authentication: digest
+
+ffmpeg:
+
+stream:
+
+binary_sensor:
+  - platform: ffmpeg_noise
+    name: BabyNoise
+    input: http://192.168.1.105/videostream.asf?user=admin&pwd=medisana
+    extra_arguments: -filter:a highpass=f=300,lowpass=f=2500,volume=volume=2 -codec:a libmp3lame -ar 16000
+    initial_state: false
+    duration: 2
+    reset: 60
+    peak: -32
+
+input_boolean:
+  baby_monitor:
+    name: Baby Monitor
+    initial: off
+
+#####
+# End of custom configuration
+#####
+
+group: !include groups.yaml
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml

@@ -1,0 +1,103 @@
+- id: '1589109347233'
+  alias: Licht terras uit met Ikea aan/uit knop
+  description: ''
+  trigger:
+  - device_id: 8fcdef7fce194fcc82d0e69ef119208e
+    domain: deconz
+    platform: device
+    subtype: turn_on
+    type: remote_button_short_press
+  condition: []
+  action:
+  - scene: scene.terras_licht_aan
+- id: '1589109682012'
+  alias: Licht terras aan met Ikea aan/uit knop
+  description: ''
+  trigger:
+  - device_id: 8fcdef7fce194fcc82d0e69ef119208e
+    domain: deconz
+    platform: device
+    subtype: turn_off
+    type: remote_button_short_press
+  condition: []
+  action:
+  - scene: scene.terras_licht_uit
+- id: '1590323930005'
+  alias: Lichten keuken aan/uit met Ikea afstandsbediening
+  description: ''
+  trigger:
+  - device_id: 86c055b427564145b96f680ab5fafaa3
+    domain: deconz
+    platform: device
+    subtype: turn_on
+    type: remote_button_short_press
+  condition: []
+  action:
+  - data: {}
+    entity_id: light.keuken_aanrecht
+    service: light.toggle
+- id: '1600607551460'
+  alias: Lamp Nora aan met kubus
+  description: ''
+  trigger:
+  - device_id: 0a81d3ccfb4211ea9dca332b32177a72
+    domain: deconz
+    platform: device
+    type: remote_flip_90_degrees
+    subtype: ''
+  condition: []
+  action:
+  - type: toggle
+    device_id: f8958b02fb4011eab3a32122833b33b0
+    entity_id: light.lamp_nora
+    domain: light
+  mode: single
+- id: '1600607957174'
+  alias: Nora Lamp - flow
+  description: ''
+  trigger:
+  - device_id: 0a81d3ccfb4211ea9dca332b32177a72
+    domain: deconz
+    platform: device
+    type: remote_flip_180_degrees
+    subtype: ''
+  condition: []
+  action:
+  - service: yeelight.set_mode
+    data:
+      entity_id: light.lamp_nora
+      mode: color_flow
+    entity_id: light.lamp_nora
+  mode: single
+- id: '1600628535607'
+  alias: Deur berging dicht
+  description: ''
+  trigger:
+  - type: not_opened
+    platform: device
+    device_id: 109dd734579e43ca96a026fc4767ecc7
+    entity_id: binary_sensor.openclose_4
+    domain: binary_sensor
+  condition: []
+  action:
+  - event: notify.mobile_app_jedi_phone
+    event_data:
+      title: Deur berging
+      message: De deur van de berging is dicht
+  mode: single
+- id: '1600628579079'
+  alias: Deur berging open
+  description: ''
+  trigger:
+  - type: opened
+    platform: device
+    device_id: 109dd734579e43ca96a026fc4767ecc7
+    entity_id: binary_sensor.openclose_4
+    domain: binary_sensor
+  condition: []
+  action:
+  - event: notify.mobile_app_jedi_phone
+    event_data:
+      title: Deur berging
+      message: De deur van de berging is open
+  mode: single
