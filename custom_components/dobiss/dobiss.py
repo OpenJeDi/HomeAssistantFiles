@@ -16,7 +16,7 @@ class DobissSystem:
         self._host = host
         self._port = port
 
-        self.socket = None
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.recvBuffer = bytearray()
 
         self.availableModules = [ ]
@@ -61,37 +61,18 @@ class DobissSystem:
 
         return result
 
-    def connect(self, tryUntilSuccess=True):
+    def connect(self):
         """Connect to a Dobiss system.
            Keeps trying to connect until it is successfully connected.
         """
-        if not self.socket is None:
-            return True
-
         success = False
 
-        if tryUntilSuccess:
-            # Keep connecting the TCP socket until success
-            while self.socket is None:
-                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                try:
-                    self.socket.connect((self.host, self.port))
-                    success = True
+        try:
+            self.socket.connect((self.host, self.port))
+            success = True
 
-                except socket.error:
-                    self.socket = None
-                    success = False
-                    time.sleep(1) # Wait for 1 second
-
-        else:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            try:
-                self.socket.connect((self.host, self.port))
-                success = True
-
-            except socket.error:
-                self.socket = None
-                success = False
+        except socket.error:
+            success = False
 
         return success
 
@@ -99,9 +80,7 @@ class DobissSystem:
     def disconnect(self):
         """Disconnect from the connected Dobiss system.
         """
-        if not self.socket is None:
-            self.socket.close()
-            self.socket = None
+        self.socket.close()
 
 
     def sendData(self, data):
@@ -116,8 +95,7 @@ class DobissSystem:
 
             except socket.error:
                 print("Dobiss socket disconnected. Reconnecting...")
-                disconnect()
-                connect(False)
+                self.connect()
                 dataSent = False
 
         return dataSent
@@ -134,21 +112,18 @@ class DobissSystem:
         while len(self.recvBuffer) < totalSize:
             try:
                 newData = [ ]
-                if self.socket:
-                    newData = self.socket.recv(RECV_SIZE)
+                newData = self.socket.recv(RECV_SIZE)
                 
                 if len(newData) == 0:
                     print("Dobiss socket connection closed: reconnecting")
-                    self.disconnect()
-                    self.connect(False)
+                    self.connect()
                 else:
                     self.recvBuffer += newData
                     #print(f"Received from socket. Buffer is now length {len(self.recvBuffer)}")
             
             except socket.error:
                 print("Dobiss socket receive error: reconnecting")
-                self.disconnect()
-                self.connect(False)
+                self.connect()
 
         # We first receive the original packet back
         # TODO Actually check the content

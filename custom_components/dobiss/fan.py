@@ -61,18 +61,14 @@ class HomeAssistantDobissFan(CoordinatorEntity, FanEntity):
     async def async_turn_on(self, **kwargs):
         """Instruct the fan to turn on.
         """
-        #if self.dobiss.connect(True): # Retry until connected
         self.dobiss.setOn(self._fan['moduleAddress'], self._fan['index'])
-            #self.dobiss.disconnect()
 
         # Poll states
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs):
         """Instruct the fan to turn off."""
-        #if self.dobiss.connect(True): # Retry until connected
         self.dobiss.setOff(self._fan['moduleAddress'], self._fan['index'])
-            #self.dobiss.disconnect()
 
         # Poll states
         await self.coordinator.async_request_refresh()

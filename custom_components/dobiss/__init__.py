@@ -100,15 +100,9 @@ class DobissDataUpdateCoordinator(DataUpdateCoordinator):
         """Initialize."""
         self.dobiss = DobissSystem(host, port)
 
-        # Connect with the Dobiss system
-        self.dobiss.connect(True) # Retry until connected
-        
-        _LOGGER.info("Connected to Dobiss system. Importing installation...")
-        
         # Import installation
+        _LOGGER.info("Importing installation...")
         self.dobiss.importFullInstallation()
-        # We are done, free the connection
-        #self.dobiss.disconnect()
 
         super().__init__(
             hass,
@@ -119,8 +113,7 @@ class DobissDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Query states"""
-        #if self.dobiss.connect(True):
+        # Note: this is blocking
         self.dobiss.requestAllStatus()
-            #self.dobiss.disconnect()
         
         return self.dobiss.values

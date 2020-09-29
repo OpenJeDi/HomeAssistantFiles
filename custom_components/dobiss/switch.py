@@ -66,18 +66,14 @@ class HomeAssistantDobissPlug(CoordinatorEntity, SwitchEntity):
     async def async_turn_on(self, **kwargs):
         """Instruct the plug to switch on.
         """
-        #if self.dobiss.connect(True): # Retry until connected
         self.dobiss.setOn(self._plug['moduleAddress'], self._plug['index'])
-            #self.dobiss.disconnect()
 
         # Poll states
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs):
         """Instruct the plug to turn off."""
-        #if self.dobiss.connect(True): # Retry until connected
         self.dobiss.setOff(self._plug['moduleAddress'], self._plug['index'])
-            #self.dobiss.disconnect()
 
         # Poll states
         await self.coordinator.async_request_refresh()
