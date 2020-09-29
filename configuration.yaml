@@ -115,13 +115,16 @@ camera:
   #- platform: generic
   - platform: ffmpeg
     name: BabyCam
-    still_image_url: http://192.168.1.105/snapshot.jpg?user=admin&pwd=medisana
+    #still_image_url: http://192.168.1.105/snapshot.jpg?user=admin&pwd=medisana
     #mjpeg_url: http://192.168.1.105/videostream.asf?user=admin&pwd=medisana
     #stream_source: http://192.168.1.105/videostream.asf?user=admin&pwd=medisana
-    verify_ssl: false
-    username: admin
-    password: medisana
-    authentication: digest
+    #verify_ssl: false
+    #username: admin
+    #password: medisana
+    #authentication: digest
+    # FFMpeg specific
+    input: "http://192.168.1.105/videostream.asf?user=admin&pwd=medisana"
+    #extra_arguments: '-q:v 1 -r 25 -vf "scale=640:360"'
 
 ffmpeg:
 
