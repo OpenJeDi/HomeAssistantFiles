@@ -25,12 +25,6 @@
       is_deconz_group: false
       state: 'on'
       supported_features: 41
-    sensor.tradfri_on_off_switch_battery_level:
-      device_class: battery
-      event_id: tradfri_on_off_switch
-      friendly_name: TRÅDFRI on/off switch Battery Level
-      state: '87'
-      unit_of_measurement: '%'
 - id: '1589109424333'
   name: Terras licht uit
   entities:
@@ -57,24 +51,10 @@
 - id: '1590925675848'
   name: Keuken - Koken
   entities:
-    light.aanrecht:
-      friendly_name: Hanglampen
-      groupIndex: 1
-      index: 2
-      moduleAddress: 2
-      name: Aanrecht
+    light.toog:
       state: 'on'
-      supported_features: 40
-      type: 0
-    light.keuken:
-      friendly_name: Keuken
-      groupIndex: 1
-      index: 0
-      moduleAddress: 2
-      name: Keuken
+    light.keuken_slimme_lichten:
       state: 'on'
-      supported_features: 40
-      type: 0
     light.keuken_aanrecht_1:
       brightness: 191
       color_temp: 367
@@ -146,45 +126,13 @@
       min_mireds: 153
       state: 'off'
       supported_features: 43
-    light.spots_keuken:
-      friendly_name: Spots keuken
-      groupIndex: 1
-      index: 1
-      moduleAddress: 2
-      name: Spots keuken
-      state: 'on'
-      supported_features: 40
-      type: 0
-    light.spots_keukeneiland:
-      friendly_name: Spots keukeneiland
-      groupIndex: 1
-      index: 3
-      moduleAddress: 2
-      name: Spots keukeneiland
-      state: 'on'
-      supported_features: 40
-      type: 0
 - id: '1590925841199'
   name: Keuken - Sfeer
   entities:
-    light.aanrecht:
-      friendly_name: Hanglampen
-      groupIndex: 1
-      index: 2
-      moduleAddress: 2
-      name: Aanrecht
+    light.toog:
       state: 'off'
-      supported_features: 40
-      type: 0
-    light.keuken:
-      friendly_name: Keuken
-      groupIndex: 1
-      index: 0
-      moduleAddress: 2
-      name: Keuken
+    light.keuken_slimme_lichten:
       state: 'on'
-      supported_features: 40
-      type: 0
     light.keuken_aanrecht_1:
       brightness: 26
       color_temp: 367
@@ -256,45 +204,13 @@
       min_mireds: 153
       state: 'off'
       supported_features: 43
-    light.spots_keuken:
-      friendly_name: Spots keuken
-      groupIndex: 1
-      index: 1
-      moduleAddress: 2
-      name: Spots keuken
-      state: 'on'
-      supported_features: 40
-      type: 0
-    light.spots_keukeneiland:
-      friendly_name: Spots keukeneiland
-      groupIndex: 1
-      index: 3
-      moduleAddress: 2
-      name: Spots keukeneiland
-      state: 'on'
-      supported_features: 40
-      type: 0
 - id: '1590925947542'
   name: Keuken - Uit
   entities:
-    light.aanrecht:
-      friendly_name: Hanglampen
-      groupIndex: 1
-      index: 2
-      moduleAddress: 2
-      name: Aanrecht
+    light.toog:
       state: 'off'
-      supported_features: 40
-      type: 0
-    light.keuken:
-      friendly_name: Keuken
-      groupIndex: 1
-      index: 0
-      moduleAddress: 2
-      name: Keuken
+    light.keuken_slimme_lichten:
       state: 'on'
-      supported_features: 40
-      type: 0
     light.keuken_aanrecht_1:
       friendly_name: Keuken Aanrecht 1
       is_deconz_group: false
@@ -358,21 +274,3 @@
       min_mireds: 153
       state: 'off'
       supported_features: 43
-    light.spots_keuken:
-      friendly_name: Spots keuken
-      groupIndex: 1
-      index: 1
-      moduleAddress: 2
-      name: Spots keuken
-      state: 'on'
-      supported_features: 40
-      type: 0
-    light.spots_keukeneiland:
-      friendly_name: Spots keukeneiland
-      groupIndex: 1
-      index: 3
-      moduleAddress: 2
-      name: Spots keukeneiland
-      state: 'on'
-      supported_features: 40
-      type: 0

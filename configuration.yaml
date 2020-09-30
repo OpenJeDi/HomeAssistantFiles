@@ -27,6 +27,12 @@ influxdb:
 # Light groups
 light:
   - platform: group
+    name: Keuken slimme lichten
+    entities:
+      - light.slim_keuken
+      - light.slim_spots_aanrecht
+      - light.slim_spots_eetkamer_keuken
+  - platform: group
     name: Keuken midden
     entities:
       - light.keuken_midden_1
@@ -60,7 +66,7 @@ light:
       - light.keuken_eetkamer_2
       - light.keuken_eetkamer_3
       # Note: not a smart light, this is the dobiss light
-      - light.aanrecht
+      - light.toog
       
   - platform: group
     name: Terras
