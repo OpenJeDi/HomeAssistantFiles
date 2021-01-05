@@ -3,6 +3,7 @@ import asyncio
 from datetime import timedelta
 import logging
 import voluptuous as vol
+import async_timeout
 
 from .dobiss import DobissSystem
 
