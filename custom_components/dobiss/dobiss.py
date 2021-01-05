@@ -19,7 +19,7 @@ class DobissSystem:
         self._port = port
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.settimeout(TIMEOUT)
+        #self.socket.settimeout(TIMEOUT)
         self.recvBuffer = bytearray()
 
         self.availableModules = [ ]
