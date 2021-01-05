@@ -114,10 +114,9 @@ class DobissDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self):
         """Query states"""
         # We use a time-out to be sure
-        try:
-            # Note: asyncio.TimeoutError and aiohttp.ClientError are already
-            # handled by the data update coordinator.
-            async with async_timeout.timeout(10):
-                # Note: this is blocking
-                self.dobiss.requestAllStatus()
-                return self.dobiss.values
+        # Note: asyncio.TimeoutError and aiohttp.ClientError are already
+        # handled by the data update coordinator.
+        async with async_timeout.timeout(10):
+            # Note: this is blocking
+            self.dobiss.requestAllStatus()
+            return self.dobiss.values
