@@ -88,15 +88,20 @@ class DobissSystem:
            Keeps trying to send the data until it is successful, reconnecting with the system if necessary.
         """
         dataSent = False
-        while not dataSent:
+        retry = True
+        while retry:
             try:
                 self.socket.sendall(data)
                 dataSent = True
+                retry = False
 
-            except socket.error:
-                print("Dobiss socket disconnected. Reconnecting...")
-                self.connect()
-                dataSent = False
+            except socket.error as e:
+                if e.errno == socket.errno.ENOTCONN:
+                    print("Dobiss socket error " + str(e) + ". Connecting...")
+                    self.connect()
+                else:
+                    print("Dobiss socket error " + str(e) + "!")
+                    retry = False
 
         return dataSent
 
@@ -116,6 +121,7 @@ class DobissSystem:
                 
                 if len(newData) == 0:
                     print("Dobiss socket connection closed: reconnecting")
+                    time.sleep(1) # Wait for a second
                     self.connect()
                 else:
                     self.recvBuffer += newData
@@ -123,6 +129,7 @@ class DobissSystem:
             
             except socket.error:
                 print("Dobiss socket receive error: reconnecting")
+                time.sleep(1) # Wait for a second
                 self.connect()
 
         # We first receive the original packet back
@@ -177,7 +184,7 @@ class DobissSystem:
                 channelAddr = i + 1
                 self.availableModules.append(channelAddr)
         
-        print("Available modulles: " + str(self.availableModules))
+        print("Available modules: " + str(self.availableModules))
 
 
     class ModuleType(IntEnum):
