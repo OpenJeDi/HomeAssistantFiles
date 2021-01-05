@@ -8,6 +8,8 @@ import time
 from enum import IntEnum
 
 RECV_SIZE = 1024
+MAX_NUM_RETRIES = 10
+TIMEOUT = 1 # We can use a short timeout on the LAN
 
 class DobissSystem:
 
@@ -17,6 +19,7 @@ class DobissSystem:
         self._port = port
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.settimeout(TIMEOUT)
         self.recvBuffer = bytearray()
 
         self.availableModules = [ ]
@@ -89,6 +92,8 @@ class DobissSystem:
         """
         dataSent = False
         retry = True
+        numRetries = 0
+        
         while retry:
             try:
                 self.socket.sendall(data)
@@ -99,6 +104,12 @@ class DobissSystem:
                 if e.errno == socket.errno.ENOTCONN:
                     print("Dobiss socket error " + str(e) + ". Connecting...")
                     self.connect()
+                    
+                    numRetries += 1
+
+                    if numRetries >= MAX_NUM_RETRIES:
+                        retry = False
+
                 else:
                     print("Dobiss socket error " + str(e) + "!")
                     retry = False
@@ -114,7 +125,10 @@ class DobissSystem:
         sentDataPaddingSize = (32 - (sentDataSize % 32)) % 32
         responsePaddingSize = (32 - (responseSize % 32)) % 32
         totalSize = sentDataSize + sentDataPaddingSize + responseSize + responsePaddingSize
-        while len(self.recvBuffer) < totalSize:
+
+        numRetries = 0
+        
+        while (len(self.recvBuffer) < totalSize) and (numRetries < MAX_NUM_RETRIES):
             try:
                 newData = [ ]
                 newData = self.socket.recv(RECV_SIZE)
@@ -130,7 +144,11 @@ class DobissSystem:
             except socket.error:
                 print("Dobiss socket receive error: reconnecting")
                 time.sleep(1) # Wait for a second
+                numRetries += 1
                 self.connect()
+        
+        if numRetries >= MAX_NUM_RETRIES:
+            return [ ]
 
         # We first receive the original packet back
         # TODO Actually check the content
