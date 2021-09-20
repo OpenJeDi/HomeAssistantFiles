@@ -102,10 +102,9 @@ class DobissSystem:
 
             except socket.error as e:
                 if e.errno == socket.errno.ENOTCONN:
-                    print("Dobiss socket error " + str(e) + ". Connecting...")
-                    self.connect()
-                    
                     numRetries += 1
+                    print(f"Dobiss socket error {str(e)}. Connecting (try {numRetries} of {MAX_NUM_RETRIES})...")
+                    self.connect()
 
                     if numRetries >= MAX_NUM_RETRIES:
                         retry = False
@@ -134,17 +133,19 @@ class DobissSystem:
                 newData = self.socket.recv(RECV_SIZE)
                 
                 if len(newData) == 0:
-                    print("Dobiss socket connection closed: reconnecting")
+                    numRetries += 1
+                    print(f"Dobiss socket connection closed. Reconnecting (try {numRetries} of {MAX_NUM_RETRIES})...")
                     time.sleep(1) # Wait for a second
                     self.connect()
+
                 else:
                     self.recvBuffer += newData
                     #print(f"Received from socket. Buffer is now length {len(self.recvBuffer)}")
             
             except socket.error:
-                print("Dobiss socket receive error: reconnecting")
-                time.sleep(1) # Wait for a second
                 numRetries += 1
+                print(f"Dobiss socket receive error. Reconnecting (try {numRetries} of {MAX_NUM_RETRIES})...")
+                time.sleep(1) # Wait for a second
                 self.connect()
         
         if numRetries >= MAX_NUM_RETRIES:
@@ -190,6 +191,10 @@ class DobissSystem:
 
         installationData = self.receiveResponse(len(data), 16)
 
+        if(len(installationData) != 16):
+            print(f"Invalid data received trying to import installation: received {len(installationData)} bytes instead of 16")
+            return
+
         # Parse the installation
         self.availableModules = [ ]
 
@@ -220,6 +225,10 @@ class DobissSystem:
         self.sendData(data)
 
         moduleData = self.receiveResponse(len(data), 16)
+
+        if(len(moduleData) != 16):
+            print(f"Invalid data received trying to import module: received {len(moduleData)} bytes instead of 16")
+            return
 
         #moduleAddr = ord(moduleData[0])
         #moduleType = ord(moduleData[14])
@@ -267,6 +276,10 @@ class DobissSystem:
         # data[30] = icon type (0=light, 1=plug, 2=fan, 3=up, 4=down); data[31] = group index
         outputsData = self.receiveResponse(len(data), 32 * outputCount)
 
+        if(len(outputsData) != 32 * outputCount):
+            print(f"Invalid data received trying to import module: received {len(outputsData)} bytes instead of {32 * outputCount}")
+            return
+
         for outputIndex in range(0, outputCount):
             line = outputsData[outputIndex * 32 : (outputIndex + 1) * 32]
             outputName = line[0:30].strip().decode()
@@ -293,6 +306,10 @@ class DobissSystem:
         self.sendData(data)
 
         statusData = self.receiveResponse(len(data), 16)
+
+        if(len(statusData) != 16):
+            print(f"Invalid data received trying to import module: received {len(statusData)} bytes instead of 16")
+            return
 
         if not moduleAddr in self.values:
             self.values[moduleAddr] = [ ]
