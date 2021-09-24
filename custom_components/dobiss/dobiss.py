@@ -71,6 +71,7 @@ class DobissSystem:
         success = False
 
         try:
+            print(f"Connecting to Dobiss system at IP {self.host} and port {self.port}")
             self.socket.connect((self.host, self.port))
             success = True
 
@@ -132,24 +133,13 @@ class DobissSystem:
                 newData = [ ]
                 newData = self.socket.recv(RECV_SIZE)
                 
-                if len(newData) == 0:
-                    numRetries += 1
-                    print(f"Dobiss socket connection closed. Reconnecting (try {numRetries} of {MAX_NUM_RETRIES})...")
-                    time.sleep(1) # Wait for a second
-                    self.connect()
-
-                else:
+                if len(newData) > 0:
                     self.recvBuffer += newData
                     #print(f"Received from socket. Buffer is now length {len(self.recvBuffer)}")
             
-            except socket.error:
-                numRetries += 1
-                print(f"Dobiss socket receive error. Reconnecting (try {numRetries} of {MAX_NUM_RETRIES})...")
-                time.sleep(1) # Wait for a second
-                self.connect()
-        
-        if numRetries >= MAX_NUM_RETRIES:
-            return [ ]
+            except socket.error as e:
+                print(f"Dobiss socket error while receiving data: {str(e)}")
+                return [ ]
 
         # We first receive the original packet back
         # TODO Actually check the content
