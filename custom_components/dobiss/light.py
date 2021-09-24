@@ -15,11 +15,13 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     """Setup the Dobiss Light platform."""
     coordinator = hass.data[DOMAIN]["coordinator"]
 
+    lights = coordinator.dobiss.lights
     _LOGGER.info("Adding lights...")
+    _LOGGER.debug(str(lights))
 
     # Add devices
     async_add_entities(
-        HomeAssistantDobissLight(coordinator, light) for light in coordinator.dobiss.lights
+        HomeAssistantDobissLight(coordinator, light) for light in lights
     )
     
     _LOGGER.info("Dobiss lights added.")
