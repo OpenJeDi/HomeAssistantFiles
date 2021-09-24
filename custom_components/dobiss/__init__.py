@@ -57,6 +57,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     port = entry.data[CONF_PORT]
     update_interval = timedelta(seconds=entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL))
 
+    _LOGGER.info(f"Setting up Dobiss Control entry with data {str(entry.data)}")
+
+    # Create from config entry
+    hass.data.setdefault(DOMAIN, {})
+    hass.data[DOMAIN][entry.entry_id] = entry.data;
+
     await setupCoordinator(hass, host, port, update_interval)
 
     for component in PLATFORMS:
@@ -69,6 +75,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""
+    _LOGGER.info("Unloading Dobiss Control entries")
     unload_ok = all(
         await asyncio.gather(
             *[
@@ -77,19 +84,31 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
             ]
         )
     )
-    if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
+
+    cfg = hass.data.get(DOMAIN)
+    _LOGGER.debug(f"{DOMAIN} hass data: {cfg}")
+    if unload_ok and cfg and cfg.get(entry.entry_id):
+        cfg.pop(entry.entry_id)
 
     return unload_ok
 
 
 async def setupCoordinator(hass, host, port, update_interval):
 
-    coordinator = DobissDataUpdateCoordinator(hass, host=host, port=port, update_interval=update_interval)
-    await coordinator.async_refresh()    
+    _LOGGER.info(f"Creating update coordinator")
+    if DOMAIN in hass.data:
+        domainData = hass.data[DOMAIN]
+        if "coordinator" in domainData:
+            _LOGGER.warning("Warning: hass data already contains a coordinator. It will be overwritten!")
+        _LOGGER.debug(f"Current hass {DOMAIN} data: {str(domainData)}")
 
-    hass.data.setdefault(DOMAIN, {})
+    coordinator = DobissDataUpdateCoordinator(hass, host=host, port=port, update_interval=update_interval)
+    await coordinator.async_refresh()
+
+    # Store the coordinator
     hass.data[DOMAIN]["coordinator"] = coordinator
+
+    _LOGGER.debug(f"New hass {DOMAIN} data: {str(hass.data[DOMAIN])}")
 
     return True
 
@@ -99,11 +118,14 @@ class DobissDataUpdateCoordinator(DataUpdateCoordinator):
 
     def __init__(self, hass, host, port, update_interval):
         """Initialize."""
+        _LOGGER.info(f"Initializing Dobiss System with host {host} and port {port}...")
         self.dobiss = DobissSystem(host, port)
 
         # Import installation
-        _LOGGER.info("Importing installation...")
+        _LOGGER.info("Importing Dobiss installation...")
+        self.dobiss.connect()
         self.dobiss.importFullInstallation()
+        _LOGGER.info("Importing Dobiss installation done")
 
         super().__init__(
             hass,
@@ -119,5 +141,7 @@ class DobissDataUpdateCoordinator(DataUpdateCoordinator):
         # handled by the data update coordinator.
         async with async_timeout.timeout(10):
             # Note: this is blocking
+            _LOGGER.debug("Requesting all statuses...")
             self.dobiss.requestAllStatus()
+            _LOGGER.debug("Requesting all statuses done")
             return self.dobiss.values
