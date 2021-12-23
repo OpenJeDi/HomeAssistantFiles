@@ -121,11 +121,7 @@ class DobissDataUpdateCoordinator(DataUpdateCoordinator):
         _LOGGER.info(f"Initializing Dobiss System with host {host} and port {port}...")
         self.dobiss = DobissSystem(host, port)
 
-        # Import installation
-        _LOGGER.info("Importing Dobiss installation...")
-        self.dobiss.connect()
-        self.dobiss.importFullInstallation()
-        _LOGGER.info("Importing Dobiss installation done")
+        self.setupCompleted = False
 
         super().__init__(
             hass,
@@ -134,8 +130,28 @@ class DobissDataUpdateCoordinator(DataUpdateCoordinator):
             update_interval=update_interval,
         )
 
+    def importInstallation(self):
+        """Import installation"""
+        _LOGGER.info("Importing Dobiss installation...")
+        self.dobiss.connect()
+        self.dobiss.importFullInstallation()
+        _LOGGER.info("Importing Dobiss installation done")
+
+    async def async_setup(self):
+        """Setup in the background"""
+        loop = asyncio.get_running_loop()
+        result = await loop.run_in_executor(None, self.importInstallation)
+        print('default thread pool', result)
+        
+        self.setupCompleted = True
+    
     async def _async_update_data(self):
         """Query states"""
+
+        # Setup if necessary
+        if not self.setupCompleted:
+            await self.async_setup()
+        
         # We use a time-out to be sure
         # Note: asyncio.TimeoutError and aiohttp.ClientError are already
         # handled by the data update coordinator.

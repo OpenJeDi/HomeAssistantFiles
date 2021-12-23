@@ -17,6 +17,7 @@ class DobissSystem:
 
         self._host = host
         self._port = port
+        self._connected = False
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #self.socket.settimeout(TIMEOUT)
@@ -36,6 +37,11 @@ class DobissSystem:
     def port(self):
         """Return the port of this system."""
         return self._port
+    
+    @property
+    def connected(self):
+        """True if the socket is connected"""
+        return self._connected
 
     @property
     def lights(self):
@@ -73,9 +79,11 @@ class DobissSystem:
         try:
             print(f"Connecting to Dobiss system at IP {self.host} and port {self.port}")
             self.socket.connect((self.host, self.port))
+            self._connected = True
             success = True
 
         except socket.error:
+            self._connected = False
             success = False
 
         return success
@@ -85,6 +93,7 @@ class DobissSystem:
         """Disconnect from the connected Dobiss system.
         """
         self.socket.close()
+        self._connected = False
 
 
     def sendData(self, data):
@@ -103,6 +112,7 @@ class DobissSystem:
 
             except socket.error as e:
                 if e.errno == socket.errno.ENOTCONN:
+                    self._connected = False
                     numRetries += 1
                     print(f"Dobiss socket error {str(e)}. Connecting (try {numRetries} of {MAX_NUM_RETRIES})...")
                     self.connect()
