@@ -69,6 +69,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         hass.async_create_task(
             hass.config_entries.async_forward_entry_setup(entry, component)
         )
+    
+    # Register service to re-import installation
+    coordinator = hass.data[DOMAIN]["coordinator"]
+    async def handle_importInstallation(call):
+        print("Importing Dobiss installation")
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(None, coordinator.importInstallation)
+
+    hass.services.async_register(DOMAIN, "importInstallation", handle_importInstallation)
 
     return True
 
