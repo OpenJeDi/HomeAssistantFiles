@@ -45,7 +45,7 @@ class HomeAssistantDobissPlug(CoordinatorEntity, SwitchEntity):
         return "{}.{}".format(self._plug['moduleAddress'], self._plug['index'])
 
     @property
-    def device_state_attributes(self):
+    def device_extra_attributes(self):
         """Return device specific state attributes."""
         return self._plug
     

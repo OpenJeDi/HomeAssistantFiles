@@ -51,7 +51,7 @@ class HomeAssistantDobissLight(CoordinatorEntity, LightEntity):
         return "{}.{}".format(self._light['moduleAddress'], self._light['index'])
 
     @property
-    def device_state_attributes(self):
+    def device_extra_attributes(self):
         """Return device specific state attributes."""
         return self._light
     

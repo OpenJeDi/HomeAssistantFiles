@@ -45,7 +45,7 @@ class HomeAssistantDobissFan(CoordinatorEntity, FanEntity):
         return "{}.{}".format(self._fan['moduleAddress'], self._fan['index'])
 
     @property
-    def device_state_attributes(self):
+    def device_extra_attributes(self):
         """Return device specific state attributes."""
         return self._fan
     

@@ -82,9 +82,10 @@ class DobissSystem:
             self._connected = True
             success = True
 
-        except socket.error:
+        except socket.error as e:
             self._connected = False
             success = False
+            print(f"Dobiss socket error while trying to connect: {str(e)}")
 
         return success
 
