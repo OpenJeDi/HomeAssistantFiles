@@ -4,7 +4,7 @@ import voluptuous as vol
 from .dobiss import DobissSystem
 from .const import DOMAIN
 
-from homeassistant.components.switch import SwitchEntity, DEVICE_CLASS_SWITCH
+from homeassistant.components.switch import SwitchEntity, SwitchDeviceClass
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 
@@ -57,7 +57,7 @@ class HomeAssistantDobissPlug(CoordinatorEntity, SwitchEntity):
     @property
     def device_class(self):
         """Return the class of this device, from component DEVICE_CLASSES."""
-        return DEVICE_CLASS_SWITCH
+        return SwitchDeviceClass.SWITCH
 
     @property
     def is_on(self):
