@@ -80,6 +80,7 @@ class DobissSystem:
             print(f"Connecting to Dobiss system at IP {self.host} and port {self.port}")
             self.socket.connect((self.host, self.port))
             self._connected = True
+            self.socket.settimeout(None)
             success = True
 
         except socket.error as e:
