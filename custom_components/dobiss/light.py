@@ -4,7 +4,7 @@ import voluptuous as vol
 from .dobiss import DobissSystem
 from .const import DOMAIN
 
-from homeassistant.components.light import SUPPORT_FLASH, SUPPORT_TRANSITION, SUPPORT_BRIGHTNESS, ATTR_BRIGHTNESS, LightEntity
+from homeassistant.components.light import SUPPORT_BRIGHTNESS, ATTR_BRIGHTNESS, LightEntity, LightEntityFeature
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 
@@ -42,9 +42,9 @@ class HomeAssistantDobissLight(CoordinatorEntity, LightEntity):
     @property
     def supported_features(self):
         if self.dobiss.modules[self._light['moduleAddress']]['type'] == DobissSystem.ModuleType.Relais:
-            return (SUPPORT_FLASH | SUPPORT_TRANSITION)
+            return LightEntityFeature.FLASH | LightEntityFeature.TRANSITION | SUPPORT_BRIGHTNESS
         else:
-            return (SUPPORT_FLASH | SUPPORT_TRANSITION | SUPPORT_BRIGHTNESS)
+            return LightEntityFeature.FLASH | LightEntityFeature.TRANSITION | SUPPORT_BRIGHTNESS
 
     @property
     def unique_id(self):
