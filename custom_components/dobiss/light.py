@@ -42,9 +42,9 @@ class HomeAssistantDobissLight(CoordinatorEntity, LightEntity):
     @property
     def supported_features(self):
         if self.dobiss.modules[self._light['moduleAddress']]['type'] == DobissSystem.ModuleType.Relais:
-            return LightEntityFeature.FLASH | LightEntityFeature.TRANSITION | SUPPORT_BRIGHTNESS
+            return LightEntityFeature.FLASH | LightEntityFeature.TRANSITION
         else:
-            return LightEntityFeature.FLASH | LightEntityFeature.TRANSITION | SUPPORT_BRIGHTNESS
+            return LightEntityFeature.FLASH | LightEntityFeature.TRANSITION
 
     @property
     def unique_id(self):
