@@ -4,7 +4,7 @@ Helper module for communicating with a Dobiss home automation system.
 
 import socket
 import logging
-import time
+import asyncio
 from enum import IntEnum
 
 RECV_SIZE = 1024
@@ -20,13 +20,13 @@ class DobissSystem:
         self._connected = False
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #self.socket.settimeout(TIMEOUT)
+        # self.socket.settimeout(TIMEOUT)
         self.recvBuffer = bytearray()
 
-        self.availableModules = [ ]
-        self.modules = { }
-        self.outputs = [ ]
-        self.values = { }
+        self.availableModules = []
+        self.modules = {}
+        self.outputs = []
+        self.values = {}
 
     @property
     def host(self):
@@ -37,7 +37,7 @@ class DobissSystem:
     def port(self):
         """Return the port of this system."""
         return self._port
-    
+
     @property
     def connected(self):
         """True if the socket is connected"""
@@ -45,7 +45,7 @@ class DobissSystem:
 
     @property
     def lights(self):
-        result = [ ]
+        result = []
         for output in self.outputs:
             if output['type'] == DobissSystem.OutputType.Light:
                 result.append(output)
@@ -54,7 +54,7 @@ class DobissSystem:
 
     @property
     def fans(self):
-        result = [ ]
+        result = []
         for output in self.outputs:
             if output['type'] == DobissSystem.OutputType.Fan:
                 result.append(output)
@@ -63,14 +63,14 @@ class DobissSystem:
 
     @property
     def plugs(self):
-        result = [ ]
+        result = []
         for output in self.outputs:
             if output['type'] == DobissSystem.OutputType.Plug:
                 result.append(output)
 
         return result
 
-    def connect(self):
+    async def connect(self):
         """Connect to a Dobiss system.
            Keeps trying to connect until it is successfully connected.
         """
@@ -97,15 +97,15 @@ class DobissSystem:
         self.socket.close()
         self._connected = False
 
-
-    def sendData(self, data):
+    async def sendData(self, data):
+        _LOGGER.debug(f"sendData {str(data)}")
         """Send data to a Dobiss system.
            Keeps trying to send the data until it is successful, reconnecting with the system if necessary.
         """
         dataSent = False
         retry = True
         numRetries = 0
-        
+
         while retry:
             try:
                 self.socket.sendall(data)
@@ -139,16 +139,16 @@ class DobissSystem:
         totalSize = sentDataSize + sentDataPaddingSize + responseSize + responsePaddingSize
 
         numRetries = 0
-        
+
         while (len(self.recvBuffer) < totalSize) and (numRetries < MAX_NUM_RETRIES):
             try:
                 newData = [ ]
                 newData = self.socket.recv(RECV_SIZE)
-                
+
                 if len(newData) > 0:
                     self.recvBuffer += newData
                     #print(f"Received from socket. Buffer is now length {len(self.recvBuffer)}")
-            
+
             except socket.error as e:
                 print(f"Dobiss socket error while receiving data: {str(e)}")
                 return [ ]
@@ -156,7 +156,7 @@ class DobissSystem:
         # We first receive the original packet back
         # TODO Actually check the content
         #original = self.recvBuffer[:sentDataSize]
-        
+
         # The actual response data
         responseData = bytearray()
         if responseSize > 0:
@@ -166,39 +166,38 @@ class DobissSystem:
 
         # Remove the response from the buffer        
         self.recvBuffer = self.recvBuffer[totalSize:]
-        
+
         return responseData
 
-
-    def importFullInstallation(self):
+    async def importFullInstallation(self):
         """Import the installation, all modules, their outputs and their status."""
 
         # Import installation
-        self.importInstallation()
+        await self.importInstallation()
 
         # Import modules
         for moduleAddr in self.availableModules:
-            self.importModule(moduleAddr)
+            await self.importModule(moduleAddr)
 
         # Outputs and their current value
         for moduleAddr, module in self.modules.items():
-            self.importOutputs(module['address'], module['type'], module['outputCount'])
-            self.requestStatus(module['address'], module['type'], module['outputCount'])
+            await self.importOutputs(module['address'], module['type'], module['outputCount'])
+            await self.requestStatus(module['address'], module['type'], module['outputCount'])
 
-
-    def importInstallation(self):
+    async def importInstallation(self):
         """Import the installation."""
         data = bytearray.fromhex("AF 0B 00 00 30 00 10 01 10 FF FF FF FF FF FF AF")
-        self.sendData(data)
+        await self.sendData(data)
 
         installationData = self.receiveResponse(len(data), 16)
 
-        if(len(installationData) != 16):
-            print(f"Invalid data received trying to import installation: received {len(installationData)} bytes instead of 16")
+        if len(installationData) != 16:
+            print(
+                f"Invalid data received trying to import installation: received {len(installationData)} bytes instead of 16")
             return
 
         # Parse the installation
-        self.availableModules = [ ]
+        self.availableModules = []
 
         # First 11 bytes (bits 0-81) contain whether or not there is a module with the specific address (1-82)
         for i in range(0, 82):
@@ -208,7 +207,7 @@ class DobissSystem:
             if hasModule:
                 channelAddr = i + 1
                 self.availableModules.append(channelAddr)
-        
+
         print("Available modules: " + str(self.availableModules))
 
 
@@ -218,27 +217,27 @@ class DobissSystem:
         Dimmer = 0x10
         V0_10 = 0x18
 
-    def importModule(self, moduleAddr):
+    async def importModule(self, moduleAddr):
         """Import a module."""
 
         # Import the module
-        #data = bytearray.fromhex("AF 10 FF " + chr(moduleAddr).encode('hex') + " 00 00 10 01 10 FF FF FF FF FF FF AF")
+        # data = bytearray.fromhex("AF 10 FF " + chr(moduleAddr).encode('hex') + " 00 00 10 01 10 FF FF FF FF FF FF AF")
         data = bytearray.fromhex("AF 10 FF " + f"{moduleAddr:02x}" + " 00 00 10 01 10 FF FF FF FF FF FF AF")
-        self.sendData(data)
+        await self.sendData(data)
 
         moduleData = self.receiveResponse(len(data), 16)
 
-        if(len(moduleData) != 16):
+        if len(moduleData) != 16:
             print(f"Invalid data received trying to import module: received {len(moduleData)} bytes instead of 16")
             return
 
-        #moduleAddr = ord(moduleData[0])
-        #moduleType = ord(moduleData[14])
-        #master = ord(moduleData[2])
+        # moduleAddr = ord(moduleData[0])
+        # moduleType = ord(moduleData[14])
+        # master = ord(moduleData[2])
         moduleAddr = moduleData[0]
         moduleType = DobissSystem.ModuleType(moduleData[14])
         master = moduleData[2]
-        masterLSB = master&1
+        masterLSB = master & 1
         isMaster = (masterLSB == 1)
 
         # 12 outputs for relais, 4 for dimmers
@@ -265,25 +264,27 @@ class DobissSystem:
         Up = 0x03
         Down = 0x04
 
-    def importOutputs(self, moduleAddr, moduleType, outputCount):
+    async def importOutputs(self, moduleAddr, moduleType, outputCount):
         """Import the outputs of a module."""
 
         # Import the module
-        #data = bytearray.fromhex("AF 10 " + chr(moduleType).encode('hex') +  + chr(moduleAddr).encode('hex') + " 01 00 20 " + chr(outputCount).encode('hex') + " 20 FF FF FF FF FF FF AF")
-        data = bytearray.fromhex("AF 10 " + f"{moduleType.value:02x}" + f"{moduleAddr:02x}" + " 01 00 20 " + f"{outputCount:02x}" + " 20 FF FF FF FF FF FF AF")
-        self.sendData(data)
+        # data = bytearray.fromhex("AF 10 " + chr(moduleType).encode('hex') +  + chr(moduleAddr).encode('hex') + " 01 00 20 " + chr(outputCount).encode('hex') + " 20 FF FF FF FF FF FF AF")
+        data = bytearray.fromhex(
+            "AF 10 " + f"{moduleType.value:02x}" + f"{moduleAddr:02x}" + " 01 00 20 " + f"{outputCount:02x}" + " 20 FF FF FF FF FF FF AF")
+        await self.sendData(data)
 
         # <module.outputCount> lines of 32 bytes
         # Output names of 30 characters; convert byte array to string;
         # data[30] = icon type (0=light, 1=plug, 2=fan, 3=up, 4=down); data[31] = group index
         outputsData = self.receiveResponse(len(data), 32 * outputCount)
 
-        if(len(outputsData) != 32 * outputCount):
-            print(f"Invalid data received trying to import module: received {len(outputsData)} bytes instead of {32 * outputCount}")
+        if len(outputsData) != 32 * outputCount:
+            print(
+                f"Invalid data received trying to import module: received {len(outputsData)} bytes instead of {32 * outputCount}")
             return
 
         for outputIndex in range(0, outputCount):
-            line = outputsData[outputIndex * 32 : (outputIndex + 1) * 32]
+            line = outputsData[outputIndex * 32: (outputIndex + 1) * 32]
             outputName = line[0:30].strip().decode()
             outputType = DobissSystem.OutputType(line[30])
             groupIndex = line[31]
@@ -299,22 +300,22 @@ class DobissSystem:
 
             print(f"Output imported: " + str(self.outputs[len(self.outputs) - 1]))
 
-
-    def requestStatus(self, moduleAddr, moduleType, outputCount):
+    async def requestStatus(self, moduleAddr, moduleType, outputCount):
         """Request the status of all outputs of a module."""
 
         # Request the status
-        data = bytearray.fromhex("AF 01 " + f"{moduleType.value:02x}" + f"{moduleAddr:02x}" + " 00 00 00 01 00 FF FF FF FF FF FF AF")
-        self.sendData(data)
+        data = bytearray.fromhex(
+            "AF 01 " + f"{moduleType.value:02x}" + f"{moduleAddr:02x}" + " 00 00 00 01 00 FF FF FF FF FF FF AF")
+        await self.sendData(data)
 
         statusData = self.receiveResponse(len(data), 16)
 
-        if(len(statusData) != 16):
+        if len(statusData) != 16:
             print(f"Invalid data received trying to import module: received {len(statusData)} bytes instead of 16")
             return
 
         if not moduleAddr in self.values:
-            self.values[moduleAddr] = [ ]
+            self.values[moduleAddr] = []
 
         for outputIndex in range(0, outputCount):
             value = statusData[outputIndex]
@@ -325,13 +326,11 @@ class DobissSystem:
             else:
                 self.values[moduleAddr][outputIndex] = value
 
-
-    def requestAllStatus(self):
+    async def requestAllStatus(self):
         """Request the status of all outputs of all modules."""
 
         for moduleAddr, module in self.modules.items():
-            self.requestStatus(module['address'], module['type'], module['outputCount'])
-
+            await self.requestStatus(module['address'], module['type'], module['outputCount'])
 
     class Action(IntEnum):
         """The type of action."""
@@ -339,37 +338,38 @@ class DobissSystem:
         TurnOn = 0x01
         Toggle = 0x02
 
-    def setOn(self, moduleAddr, outputIndex, brightness = 100):
+    async def setOn(self, moduleAddr, outputIndex, brightness=100):
         """Switch an output on."""
-
+        _LOGGER.debug("setOn")
         action = DobissSystem.Action.TurnOn
-        self.sendAction(moduleAddr, outputIndex, action, brightness)
+        await self.sendAction(moduleAddr, outputIndex, action, brightness)
 
-    def setOff(self, moduleAddr, outputIndex):
+    async def setOff(self, moduleAddr, outputIndex):
         """Switch an output off."""
-
+        _LOGGER.debug("setOff")
         action = DobissSystem.Action.TurnOff
-        self.sendAction(moduleAddr, outputIndex, action)
+        await self.sendAction(moduleAddr, outputIndex, action)
 
-    def toggle(self, moduleAddr, outputIndex):
+    async def toggle(self, moduleAddr, outputIndex):
         """Toggle an output."""
-
+        _LOGGER.debug("toggle")
         action = DobissSystem.Action.Toggle
-        self.sendAction(moduleAddr, outputIndex, action)
+        await self.sendAction(moduleAddr, outputIndex, action)
 
-    def sendAction(self, moduleAddr, outputIndex, action, value = 100, delayOn = 0xFF, delayOff = 0xFF, softDim = 0xFF, red = 0xFF):
+    async def sendAction(self, moduleAddr, outputIndex, action, value=100, delayOn=0xFF, delayOff=0xFF, softDim=0xFF,
+                   red=0xFF):
         """Generic method to send an action to an output."""
-
+        _LOGGER.debug("sendAction")
         # Send the request header
         headerData = bytearray.fromhex("AF 02 FF " + f"{moduleAddr:02x}" + " 00 00 08 01 08 FF FF FF FF FF FF AF")
-        self.sendData(headerData)
+        await self.sendData(headerData)
 
         # Note: no additional data is sent back
         self.receiveResponse(len(headerData), 0)
 
         # Send the request data
         requestData = bytes((moduleAddr, outputIndex, action.value, delayOn, delayOff, int(value), softDim, red))
-        self.sendData(requestData)
+        await self.sendData(requestData)
 
         # Note: no additional data is sent back
         self.receiveResponse(len(requestData), 0)
