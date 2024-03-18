@@ -9,7 +9,11 @@ from enum import IntEnum
 
 RECV_SIZE = 1024
 MAX_NUM_RETRIES = 10
-TIMEOUT = 1 # We can use a short timeout on the LAN
+TIMEOUT = 1  # We can use a short timeout on the LAN
+RETRY_DELAY = 1  # Set the delay between retries in seconds
+
+_LOGGER = logging.getLogger(__name__)
+
 
 class DobissSystem:
 
@@ -19,7 +23,8 @@ class DobissSystem:
         self._port = port
         self._connected = False
 
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket = None
+        # self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.socket.settimeout(TIMEOUT)
         self.recvBuffer = bytearray()
 
@@ -74,60 +79,76 @@ class DobissSystem:
         """Connect to a Dobiss system.
            Keeps trying to connect until it is successfully connected.
         """
-        success = False
+        retry_delay = 1  # Initial delay in seconds
+        retries = 0
+        while not self._connected and retries < MAX_NUM_RETRIES:
+            try:
+                _LOGGER.info(f"connect through connect_logic")
+                self.connect_logic()
+            except socket.error as e:
+                _LOGGER.error(f"Dobiss socket error while trying to connect: {str(e)}")
+                # self.disconnect()
+                self._connected = False
+                retries += 1
+                if retries < MAX_NUM_RETRIES:
+                    _LOGGER.debug(f"Retrying in {retry_delay} seconds...")
+                    # time.sleep(retry_delay)
+                    await asyncio.sleep(retry_delay)
+                    retry_delay *= 2  # Exponential backoff
+                    # self.connect_logic()
+                else:
+                    _LOGGER.error("Maximum retry attempts reached. Connection failed.")
+                    break
 
-        try:
-            print(f"Connecting to Dobiss system at IP {self.host} and port {self.port}")
-            self.socket.connect((self.host, self.port))
-            self._connected = True
-            self.socket.settimeout(None)
-            success = True
-
-        except socket.error as e:
-            self._connected = False
-            success = False
-            print(f"Dobiss socket error while trying to connect: {str(e)}")
-
-        return success
-
+    def connect_logic(self):
+        _LOGGER.info(f"Connecting to Dobiss system at IP {self.host} and port {self.port}")
+        # self.socket.connect((self.host, self.port))
+        self.socket = socket.create_connection((self.host, self.port))
+        self._connected = True
+        # self.socket.settimeout(None)
+        _LOGGER.info("Connected to Dobiss system.")
 
     def disconnect(self):
         """Disconnect from the connected Dobiss system.
         """
-        self.socket.close()
-        self._connected = False
+        _LOGGER.error("disconnecting from Dobiss system")
+
+        try:
+            self.socket.close()
+        except socket.error as e:
+            _LOGGER.error(f"Dobiss socket error {str(e)}")
+        finally:
+            self._connected = False
 
     async def sendData(self, data):
         _LOGGER.debug(f"sendData {str(data)}")
         """Send data to a Dobiss system.
            Keeps trying to send the data until it is successful, reconnecting with the system if necessary.
         """
-        dataSent = False
+        # dataSent = False
         retry = True
-        numRetries = 0
+        num_retries = 0
 
-        while retry:
-            try:
-                self.socket.sendall(data)
-                dataSent = True
-                retry = False
+        # while retry:
+        try:
+            self.socket.sendall(data)
+            # retry = False
+            return True
+        except socket.error as e:
+            _LOGGER.error(f"Dobiss socket error on sending data {str(e)}")
+            await self.reconnect(data)
+            # num_retries += 1
+            # if num_retries >= MAX_NUM_RETRIES:
+            #     return False
+            # time.sleep(RETRY_DELAY)  # Introduce a delay between retries # HA does not allow this
+        # return False
 
-            except socket.error as e:
-                if e.errno == socket.errno.ENOTCONN:
-                    self._connected = False
-                    numRetries += 1
-                    print(f"Dobiss socket error {str(e)}. Connecting (try {numRetries} of {MAX_NUM_RETRIES})...")
-                    self.connect()
-
-                    if numRetries >= MAX_NUM_RETRIES:
-                        retry = False
-
-                else:
-                    print("Dobiss socket error " + str(e) + "!")
-                    retry = False
-
-        return dataSent
-
+    async def reconnect(self, data):
+        _LOGGER.info(f"Dobiss for the reconnect")
+        # self.disconnect()
+        await self.connect()
+        if data:
+            await self.sendData(data)
 
     def receiveResponse(self, sentDataSize, responseSize):
         """Receive response"""
@@ -142,20 +163,19 @@ class DobissSystem:
 
         while (len(self.recvBuffer) < totalSize) and (numRetries < MAX_NUM_RETRIES):
             try:
-                newData = [ ]
-                newData = self.socket.recv(RECV_SIZE)
+                received_data = self.socket.recv(RECV_SIZE)
 
-                if len(newData) > 0:
-                    self.recvBuffer += newData
-                    #print(f"Received from socket. Buffer is now length {len(self.recvBuffer)}")
+                if received_data:
+                    self.recvBuffer += received_data
+                    # print(f"Received from socket. Buffer is now length {len(self.recvBuffer)}")
 
             except socket.error as e:
                 print(f"Dobiss socket error while receiving data: {str(e)}")
-                return [ ]
+                return []
 
         # We first receive the original packet back
         # TODO Actually check the content
-        #original = self.recvBuffer[:sentDataSize]
+        # original = self.recvBuffer[:sentDataSize]
 
         # The actual response data
         responseData = bytearray()
@@ -209,7 +229,6 @@ class DobissSystem:
                 self.availableModules.append(channelAddr)
 
         print("Available modules: " + str(self.availableModules))
-
 
     class ModuleType(IntEnum):
         """The type of module."""
