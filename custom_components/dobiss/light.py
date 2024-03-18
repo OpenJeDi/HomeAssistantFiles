@@ -86,10 +86,16 @@ class HomeAssistantDobissLight(CoordinatorEntity, LightEntity):
         """
         _LOGGER.debug("async_turn_on")
         pct = int(kwargs.get(ATTR_BRIGHTNESS, 255) * 100 / 255)
-        self.dobiss.setOn(self._light['moduleAddress'], self._light['index'], pct)
-
-        # Poll states
+        await self.dobiss.setOn(self._light['moduleAddress'], self._light['index'], pct)
         await self.coordinator.async_request_refresh()
+
+    @property
+    def supported_color_modes(self):
+        return [ColorMode.ONOFF]
+
+    @property
+    def color_mode(self):
+        return ColorMode.ONOFF
 
     async def async_turn_off(self, **kwargs):
         """Instruct the light to turn off."""
