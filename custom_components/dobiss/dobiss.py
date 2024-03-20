@@ -145,7 +145,7 @@ class DobissSystem:
 
     async def reconnect(self, data):
         _LOGGER.info(f"Dobiss for the reconnect")
-        # self.disconnect()
+        self.disconnect()
         await self.connect()
         if data:
             await self.sendData(data)
